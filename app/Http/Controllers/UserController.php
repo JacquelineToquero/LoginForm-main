@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function userprofile()
+    public function userprofile(User $user)
     {
-        return view('userprofile');
+        // $user = User::findOrFail($id);
+        return view('userprofile', compact('user'));
     }
 
     public function about()
@@ -27,7 +30,7 @@ class UserController extends Controller
     }
     public function show($id)
     {
-        $user = User::findOrFail($id); // Fetch the user by ID or fail
+        // Fetch the user by ID or fail
         return view('users.show', compact('user')); // Pass the user to the view
     }
 
@@ -39,12 +42,23 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $product = User::findOrFail($id);
+        $user = User::findOrFail($id);
 
-        $product->update($request->all());
+        $user->update($request->all());
 
-        return redirect()->route('user.index')->with('success', 'product updated successfully');
+        return redirect()->route('user.index')->with('success', 'User updated successfully');
     }
+
+    public function updateRole(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->update($request->all());
+
+        return redirect()->route('admin.home')->with('success', 'User updated successfully');
+    }
+
+
     public function destroy($id)
     {
         // Find the user by ID or fail
@@ -67,8 +81,13 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        User::create($request->all());
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // Hash the password before saving
+            'type' => "0" // Default user type
+        ]);
 
-        return redirect()->route('user.index')->with('success', 'Product added successfully');
+        return redirect()->route('user.index')->with('success', 'User added successfully');
     }
 }

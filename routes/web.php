@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\PasswordReset;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -38,6 +39,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'loginAction')->name('login.action');
     Route::get('logout', 'logout')->middleware('auth')->name('logout');
 
+    // Forgot password Route
     Route::get('/forgot-password', function () {
         return view('auth.forgot-password');
     })->middleware('guest')->name('password.request');
@@ -58,6 +60,7 @@ Route::controller(AuthController::class)->group(function () {
         return view('auth.reset-password', ['token' => $token]);
     })->middleware('guest')->name('password.reset');
 
+    // reset password
     Route::post('/reset-password', function (Request $request) {
         $request->validate([
             'token' => 'required',
@@ -88,6 +91,7 @@ Route::controller(AuthController::class)->group(function () {
 Route::middleware(['auth', 'user-access:user'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/profile', [UserController::class, 'userprofile'])->name('profile');
+    Route::post('/profile/user/{id}', [UserController::class, 'updateRole'])->name('users.update');
 });
 
 // Admin Routes
@@ -102,3 +106,5 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Route::put('/admin/users/edit/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/destroy/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
+
+Route::post('/admin/{user}/verifyadmin', [UserController::class, 'adminverify'])->name('admin.adminverify');
